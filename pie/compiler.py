@@ -4,7 +4,6 @@ import time
 import imp
 import opcode
 import types
-from opcode import opmap
 
 def f(): return
 code = type(f.__code__)
@@ -17,10 +16,12 @@ def pack_b(value):
 
 class Compiler(object):
     def __init__(self):
-        self.consts = [None, ]
+        self.consts = []
         self.names = []
         self.varnames = []
         self.codes = []
+
+        self.LOAD_CONST(self.make_const(None))   # default return value
 
     def __getattr__(self, name):
         if name not in opcode.opmap:
@@ -34,38 +35,39 @@ class Compiler(object):
                 self.codes.append(pack_b(opcode.opmap[name]))
         return callable
 
-    def add_const(self, value):
+    def make_const(self, value):
         self.consts.append(value)
         return len(self.consts) - 1
 
-    def add_name(self, value):
+    def make_name(self, value):
         self.names.append(value)
-        return len(self.names)
+        return len(self.names) - 1
+
+    def make_varname(self, value):
+        self.varnames.append(value)
+        return len(self.varnames)
 
     def compile(self, form):
         if type(form) == types.IntType:
-            self.consts.append(form)
-            return len(self.consts)
-        if form[0] == 'abs':
+            self.LOAD_CONST(self.make_const(form))
+        elif form[0] == 'abs':
             func, param = form
-            self.LOAD_GLOBAL(self.add_name(func))
-            self.LOAD_CONST(self.add_const(param))
+            self.LOAD_GLOBAL(self.make_name(func))
+            self.compile(param)
             self.CALL_FUNCTION(1)
-            self.PRINT_ITEM()
-            self.PRINT_NEWLINE()
-        if form[0] == 'define':
+            self.RETURN_VALUE()
+        elif form[0] == 'define':
             _, name, value = form
-            self.varnames.append(name)
-            self.consts.append(value)
-            self.LOAD_CONST(len(self.consts) - 1)
-            self.STORE_FAST(len(self.varnames) - 1)
+            self.LOAD_CONST(self.make_const(value))
+            self.STORE_FAST(self.make_varname(name))
+            self.LOAD_CONST(self.make_const(None))
+            self.RETURN_VALUE()
+        else:
+            raise SyntaxError
 
 
     def dump(self):
-        self.codes.append(struct.pack('B', opmap['LOAD_CONST']))
-        self.consts.append('hahaha')
-        self.codes.append(struct.pack('H', len(self.consts) - 1))
-        self.codes.append(struct.pack('B', opmap['RETURN_VALUE']))
+        self.RETURN_VALUE()
 
         code_string = ''.join(self.codes)
         consts = tuple(self.consts)
@@ -97,6 +99,6 @@ def test_define():
 
 def test_abs():
     c = Compiler()
-    c.compile(['abs', -100])
+    c.compile(['abs', ['abs', ['abs', -42]]])
     return c.dump()
 
