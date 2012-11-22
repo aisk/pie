@@ -54,14 +54,11 @@ class Compiler(object):
             pass    # TODO: variable
         elif type(form) != types.ListType:
             self.LOAD_CONST(self.make_const(form))
-        #if type(form) == types.IntType:
-        #    self.LOAD_CONST(self.make_const(form))
-        elif form[0] == 'abs':
-            func, param = form
-            self.LOAD_GLOBAL(self.make_name(func))
-            self.compile(param)
-            self.CALL_FUNCTION(1)
-            self.RETURN_VALUE()
+        #elif form[0] == 'abs':
+        #    func, param = form
+        #    self.LOAD_GLOBAL(self.make_name(func))
+        #    self.compile(param)
+        #    self.CALL_FUNCTION(1)
         elif form[0] == 'define':
             _, name, value = form
             self.LOAD_CONST(self.make_const(value))
@@ -69,7 +66,11 @@ class Compiler(object):
             self.LOAD_CONST(self.make_const(None))
             self.RETURN_VALUE()
         else:
-            raise SyntaxError
+            func = form[0]
+            params = form[1:]
+            self.LOAD_GLOBAL(self.make_name(func))
+            map(lambda x: self.compile(x), params)
+            self.CALL_FUNCTION(len(params))
 
 
     def dump(self):
@@ -108,3 +109,7 @@ def test_abs():
     c.compile(['abs', ['abs', ['abs', -42]]])
     return c.dump()
 
+def test_func():
+    c = Compiler()
+    c.compile(['ord', 'a'])
+    return c.dump()

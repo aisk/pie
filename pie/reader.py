@@ -48,6 +48,8 @@ class Reader(object):
             return True
         elif token == '#f':
             return False
+        elif token[0] == '"':
+            return token[1:-1].decode('string_escape')
         try:
             return int(token)
         except ValueError:
