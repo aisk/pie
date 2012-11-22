@@ -1,5 +1,6 @@
 import re
 import cStringIO as StringIO
+from pie.scm_type import Symbol
 
 '''Simple scheme reader based on norvig's lispy'''
 
@@ -47,5 +48,11 @@ class Reader(object):
             return True
         elif token == '#f':
             return False
-        else: return token
+        try:
+            return int(token)
+        except ValueError:
+            try:
+                return float(token)
+            except ValueError:
+                return Symbol(token)
 

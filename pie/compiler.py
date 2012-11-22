@@ -5,6 +5,8 @@ import imp
 import opcode
 import types
 
+from pie.scm_type import Symbol
+
 def f(): return
 code = type(f.__code__)
 del f
@@ -48,8 +50,12 @@ class Compiler(object):
         return len(self.varnames)
 
     def compile(self, form):
-        if type(form) == types.IntType:
+        if type(form) == Symbol:
+            pass    # TODO: variable
+        elif type(form) != types.ListType:
             self.LOAD_CONST(self.make_const(form))
+        #if type(form) == types.IntType:
+        #    self.LOAD_CONST(self.make_const(form))
         elif form[0] == 'abs':
             func, param = form
             self.LOAD_GLOBAL(self.make_name(func))
