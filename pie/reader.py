@@ -1,6 +1,6 @@
 import re
 import cStringIO as StringIO
-from pie.scm_type import Symbol
+from pie.builtin import Symbol
 
 '''Simple scheme reader based on norvig's lispy'''
 
