@@ -1,6 +1,7 @@
 import os
 import unittest
 
+from pie.builtin import *
 from pie.compiler import save_pyc
 from pie.compiler import Compiler
 
@@ -14,6 +15,11 @@ class SimpleCompilerTestCase(unittest.TestCase):
     def test_nest_func_call(self):
         c = Compiler()
         c.compile(['abs', ['max', -100, -42]])
+        self.assertEqual(eval(c.dump()), 42)
+    def test_define(self):
+        c = Compiler()
+        c.compile(['define', Symbol('answer'), -42])
+        c.compile(['abs', Symbol('answer')])
         self.assertEqual(eval(c.dump()), 42)
 
 class PycTestCase(unittest.TestCase):

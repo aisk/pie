@@ -47,20 +47,17 @@ class Compiler(object):
 
     def make_varname(self, value):
         self.varnames.append(value)
-        return len(self.varnames)
+        return len(self.varnames) - 1
 
     def compile(self, form):
         if type(form) == Symbol:
-            pass    # TODO: variable
+            self.LOAD_FAST(0)
         elif type(form) != types.ListType:
             self.LOAD_CONST(self.make_const(form))
         elif form[0] == sym_define:
             _, name, value = form
-            #self.LOAD_CONST(self.make_const(value))
             self.compile(value)
             self.STORE_FAST(self.make_varname(name))
-            self.LOAD_CONST(self.make_const(None))
-            self.RETURN_VALUE()
         else:
             func = form[0]
             params = form[1:]
