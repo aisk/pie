@@ -22,6 +22,7 @@ class Compiler(object):
         self.names = []
         self.varnames = []
         self.codes = []
+        self.code_length = 0
 
         self.LOAD_CONST(self.make_const(None))   # default return value
 
@@ -33,8 +34,10 @@ class Compiler(object):
                 if len(args) < 1: raise ValueError('no enough argument')
                 self.codes.append(pack_b(opcode.opmap[name]))
                 self.codes.append(pack_h(args[0]))
+                self.code_length += 3
             else:
                 self.codes.append(pack_b(opcode.opmap[name]))
+                self.code_length += 1
         return opfunc
 
     def make_const(self, value):
@@ -54,7 +57,29 @@ class Compiler(object):
             self.LOAD_FAST(0)
         elif type(form) != types.ListType:
             self.LOAD_CONST(self.make_const(form))
-        elif form[0] == sym_define:
+        elif form[0] is sym_if:
+            if len(form) == 3:
+                _, test, conseq = form
+                self.compile(test)
+                self.POP_JUMP_IF_FALSE(0)
+                pos = len(self.codes) - 1
+                self.compile(conseq)
+                self.codes[pos] = pack_h(self.code_length)
+            elif len(form) == 4:
+                _, test, conseq, alt = form
+                self.compile(test)
+                self.POP_JUMP_IF_FALSE(0)
+                pos_falsejump = len(self.codes) - 1
+                self.compile(conseq)
+                self.JUMP_ABSOLUTE(0)
+                pos_finishjump = len(self.codes) - 1
+                self.codes[pos_falsejump] = pack_h(self.code_length)
+                self.compile(alt)
+                self.codes[pos_finishjump] = pack_h(self.code_length)
+            else:
+                raise SyntaxError
+            pass
+        elif form[0] is sym_define:
             _, name, value = form
             self.compile(value)
             self.STORE_FAST(self.make_varname(name))
