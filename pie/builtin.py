@@ -10,7 +10,7 @@ sym_set = Symbol('set!')
 sym_quote = Symbol('quote')
 sym_begin = Symbol('begin')
 
-sym_begin = Symbol('import')
+sym_import = Symbol('import')
 
 add = sum
 

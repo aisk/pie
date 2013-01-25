@@ -1,7 +1,7 @@
 import unittest
 
-from pie.reader import Reader
 from pie.builtin import *
+from pie.reader import Reader
 
 class SimpleReaderTestCase(unittest.TestCase):
     def setUp(self):
@@ -14,4 +14,10 @@ class SimpleReaderTestCase(unittest.TestCase):
         self.assertIsInstance(self.ret[1], int)
         self.assertIsInstance(self.ret[2], list)
         self.assertIsInstance(self.ret[2][2], str)
-
+class SymbolTestCase(unittest.TestCase):
+    def test_define(self):
+        ret = Reader('(define a 1)').read()
+        self.assertListEqual(ret, [sym_define, 'a', 1])
+    def test_if(self):
+        ret = Reader('(if a #t #f)').read()
+        self.assertListEqual(ret, [sym_if, 'a', True, False])

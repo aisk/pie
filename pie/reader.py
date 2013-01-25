@@ -1,4 +1,5 @@
 import re
+from builtin import *
 import cStringIO as StringIO
 from pie.builtin import Symbol
 
@@ -48,6 +49,10 @@ class Reader(object):
             return True
         elif token == '#f':
             return False
+        elif token == 'define':
+            return sym_define
+        elif token == 'if':
+            return sym_if
         elif token[0] == '"':
             return token[1:-1].decode('string_escape')
         try:
