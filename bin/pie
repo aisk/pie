@@ -1,0 +1,22 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+import sys
+try:
+    from pie.builtin import *
+    from pie.reader import Reader
+    from pie.compiler import Compiler
+except ImportError:
+    sys.path.insert(0, '../')
+    from pie.builtin import *
+    from pie.reader import Reader
+    from pie.compiler import Compiler
+
+def main(filename):
+    r = Reader(open(filename)).read()
+    c = Compiler()
+    c.compile(r)
+    eval(c.dump())
+
+if __name__ == '__main__':
+    main(sys.argv[1])
