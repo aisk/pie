@@ -2,7 +2,7 @@ import os
 import dis
 import unittest
 
-from pie.builtin import *
+from pie.type import *
 from pie.compiler import save_pyc
 from pie.compiler import Compiler
 
@@ -31,8 +31,12 @@ class SimpleCompilerTestCase(unittest.TestCase):
         self.assertEqual(eval(c.dump()), "True!")
         c = Compiler()
         c.compile([sym_if, False, "True!", "False!"])
-        dis.dis(c.dump())
         self.assertEqual(eval(c.dump()), "False!")
+    def test_begin(self):
+        c = Compiler()
+        c.compile([sym_begin, [sym_define, Symbol('answer'), 42],
+            ['abs', Symbol('answer')]])
+        self.assertEqual(eval(c.dump()), 42)
 
 class PycTestCase(unittest.TestCase):
     def setUp(self):

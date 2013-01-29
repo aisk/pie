@@ -5,7 +5,7 @@ import imp
 import opcode
 import types
 
-from pie.builtin import *
+from pie.type import *
 
 code = types.CodeType
 
@@ -83,6 +83,9 @@ class Compiler(object):
             _, name, value = form
             self.compile(value)
             self.STORE_FAST(self.make_varname(name))
+        elif form[0] is sym_begin:
+            for exp in form[1:]:
+                self.compile(exp)
         else:
             func = form[0]
             params = form[1:]

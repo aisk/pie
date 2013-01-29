@@ -1,6 +1,6 @@
 import unittest
 
-from pie.builtin import *
+from pie.type import *
 from pie.reader import Reader
 
 class SimpleReaderTestCase(unittest.TestCase):
@@ -21,3 +21,6 @@ class SymbolTestCase(unittest.TestCase):
     def test_if(self):
         ret = Reader('(if a #t #f)').read()
         self.assertListEqual(ret, [sym_if, 'a', True, False])
+    def test_begin(self):
+        ret = Reader('(begin (print "Hello World!") (abs -42))').read()
+        self.assertEqual(ret[0], sym_begin)

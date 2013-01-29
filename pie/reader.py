@@ -1,7 +1,6 @@
 import re
-from builtin import *
+from type import *
 import cStringIO as StringIO
-from pie.builtin import Symbol
 
 '''Simple scheme reader based on norvig's lispy'''
 
@@ -53,6 +52,8 @@ class Reader(object):
             return sym_define
         elif token == 'if':
             return sym_if
+        elif token == 'begin':
+            return sym_begin
         elif token[0] == '"':
             return token[1:-1].decode('string_escape')
         try:
